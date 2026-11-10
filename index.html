@@ -1,0 +1,539 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>TaskMaster - Sistema de Controle de Tarefas</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS do projeto -->
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div class="app-layout" id="app-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+
+            <div class="sidebar-header">
+
+                <div class="brand">
+                    <div class="brand-icon">
+                        <i class="fa-solid fa-square-check"></i>
+                    </div>
+
+                    <span class="brand-title">TaskMaster</span>
+                </div>
+
+                <button class="sidebar-toggle"
+                    onclick="toggleSidebar()"
+                    title="Recolher menu">
+
+                    <i class="fa-solid fa-chevron-left"
+                        id="toggle-icon"></i>
+
+                </button>
+
+            </div>
+
+            <nav class="sidebar-nav">
+
+                <button class="nav-item active"
+                    onclick="switchTab('kanban')"
+                    title="Quadro Kanban">
+
+                    <i class="fa-solid fa-table-columns"></i>
+                    <span>Quadro Kanban</span>
+
+                </button>
+
+                <button class="nav-item"
+                    onclick="switchTab('dashboard')"
+                    title="Visão Geral">
+
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Visão Geral</span>
+
+                </button>
+
+                <button class="nav-item"
+                    onclick="switchTab('categorias')"
+                    title="Categorias">
+
+                    <i class="fa-solid fa-tags"></i>
+                    <span>Categorias</span>
+
+                </button>
+
+            </nav>
+
+        </aside>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="main-wrapper">
+
+            <!-- TOPBAR -->
+            <header class="topbar">
+
+                <div class="topbar-search">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input type="text"
+                        id="global-search"
+                        placeholder="Pesquisar tarefas..."
+                        onkeyup="renderAll()">
+
+                </div>
+
+                <div class="topbar-right">
+
+                    <div class="current-date-badge"
+                        id="header-date-badge">
+
+                        <i class="fa-regular fa-calendar-days"></i>
+
+                        <span id="current-date-text">
+                            Carregando...
+                        </span>
+
+                    </div>
+
+                    <button class="btn btn-primary"
+                        onclick="openNewTaskModal()">
+
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Nova Tarefa</span>
+
+                    </button>
+
+                </div>
+
+            </header>
+
+            <!-- NOTIFICAÇÕES -->
+            <div id="toast-container"
+                class="toast-container"></div>
+
+            <main class="content-viewport">
+
+                <!-- QUADRO KANBAN -->
+                <section id="tab-kanban"
+                    class="tab-page active">
+
+                    <div class="welcome-banner">
+
+                        <div>
+                            <h1 id="welcome-greeting">Olá!</h1>
+
+                            <p>
+                                Gerencie o fluxo de suas atividades
+                                com eficiência e precisão.
+                            </p>
+                        </div>
+
+                        <div class="banner-filters">
+
+                            <div class="filter-select-wrapper">
+
+                                <i class="fa-solid fa-filter"></i>
+
+                                <select id="filter-categoria"
+                                    onchange="renderAll()">
+
+                                    <option value="">
+                                        Todas as Categorias
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <button class="btn btn-clear-filter"
+                                onclick="clearFilters()"
+                                title="Limpar filtros">
+
+                                <i class="fa-solid fa-rotate-left"></i>
+                                Limpar Filtros
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- COLUNAS KANBAN -->
+                    <div class="kanban-board">
+
+                        <div class="kanban-column">
+
+                            <div class="column-header">
+
+                                <div class="col-title-group">
+                                    <span class="status-dot pendente"></span>
+                                    <h3>Pendentes</h3>
+                                </div>
+
+                                <span class="col-badge"
+                                    id="count-pendente">0</span>
+
+                            </div>
+
+                            <div class="column-cards-list"
+                                id="cards-pendente"></div>
+
+                        </div>
+
+                        <div class="kanban-column">
+
+                            <div class="column-header">
+
+                                <div class="col-title-group">
+                                    <span class="status-dot andamento"></span>
+                                    <h3>Em Execução</h3>
+                                </div>
+
+                                <span class="col-badge"
+                                    id="count-andamento">0</span>
+
+                            </div>
+
+                            <div class="column-cards-list"
+                                id="cards-andamento"></div>
+
+                        </div>
+
+                        <div class="kanban-column">
+
+                            <div class="column-header">
+
+                                <div class="col-title-group">
+                                    <span class="status-dot concluida"></span>
+                                    <h3>Concluídas</h3>
+                                </div>
+
+                                <span class="col-badge"
+                                    id="count-concluida">0</span>
+
+                            </div>
+
+                            <div class="column-cards-list"
+                                id="cards-concluida"></div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- DASHBOARD -->
+                <section id="tab-dashboard"
+                    class="tab-page">
+
+                    <div class="section-header-clean">
+
+                        <h1>Métricas do Sistema</h1>
+
+                        <p>
+                            Acompanhamento estatístico dos registros
+                            persistidos no banco de dados.
+                        </p>
+
+                    </div>
+
+                    <div class="stats-grid-clean">
+
+                        <div class="stat-box">
+                            <span class="stat-label">Total de Tarefas</span>
+                            <div class="stat-number" id="metric-total">0</div>
+                        </div>
+
+                        <div class="stat-box">
+                            <span class="stat-label">Pendentes</span>
+                            <div class="stat-number text-pendente" id="metric-pendente">0</div>
+                        </div>
+
+                        <div class="stat-box">
+                            <span class="stat-label">Em Execução</span>
+                            <div class="stat-number text-andamento" id="metric-andamento">0</div>
+                        </div>
+
+                        <div class="stat-box">
+                            <span class="stat-label">Concluídas</span>
+                            <div class="stat-number text-concluida" id="metric-concluida">0</div>
+                        </div>
+
+                        <div class="stat-box alert-box">
+                            <span class="stat-label">Vencidas</span>
+                            <div class="stat-number text-danger" id="metric-vencidas">0</div>
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- CATEGORIAS -->
+                <section id="tab-categorias"
+                    class="tab-page">
+
+                    <div class="section-header-clean">
+
+                        <h1>Gerenciamento de Categorias</h1>
+
+                        <p>
+                            Estrutura da tabela
+                            <code>categorias</code>
+                            ordenada alfabeticamente.
+                        </p>
+
+                    </div>
+
+                    <div class="categories-layout-clean">
+
+                        <div class="panel-card">
+
+                            <h3>Nova Categoria</h3>
+
+                            <form id="category-form"
+                                onsubmit="handleCategorySubmit(event)">
+
+                                <div class="form-field">
+
+                                    <label for="cat-nome">Nome </label>
+
+                                    <input type="text"
+                                        id="cat-nome"
+                                        placeholder="Ex: Projetos, Pessoal..."
+                                        required>
+
+                                </div>
+
+                                <button type="submit"
+                                    class="btn btn-primary btn-block">
+
+                                    Salvar Categoria
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                        <div class="panel-card">
+
+                            <h3>Categorias Cadastradas</h3>
+
+                            <div class="table-container">
+
+                                <table class="clean-table">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Nome da Categoria</th>
+                                            <th class="text-right">Ações</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="categories-table-body"></tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </main>
+
+        </div>
+
+    </div>
+
+    <!-- MODAL DE TAREFA -->
+    <div id="task-modal" class="modal-backdrop">
+
+        <div class="modal-box">
+
+            <div class="modal-header">
+
+                <h3 id="modal-title">Nova Tarefa</h3>
+
+                <button class="modal-close-btn"
+                    onclick="closeTaskModal()">
+                    &times;
+                </button>
+
+            </div>
+
+            <form id="task-form"
+                onsubmit="handleTaskSubmit(event)">
+
+                <input type="hidden" id="task-id">
+
+                <div class="form-field">
+
+                    <label for="task-titulo">Título *</label>
+
+                    <input type="text"
+                        id="task-titulo"
+                        placeholder="Título descritivo da tarefa"
+                        required>
+
+                </div>
+
+                <div class="form-field">
+
+                    <label for="task-descricao">Descrição</label>
+
+                    <textarea id="task-descricao"
+                        rows="3"
+                        placeholder="Detalhes opcionais..."></textarea>
+
+                </div>
+
+                <div class="form-row-2">
+
+                    <div class="form-field">
+
+                        <label for="task-prazo">Prazo Limite</label>
+
+                        <input type="date" id="task-prazo">
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label for="task-categoria">Categoria</label>
+
+                        <select id="task-categoria">
+
+                            <option value="">Sem Categoria</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="form-field"
+                    id="status-group"
+                    style="display: none;">
+
+                    <label for="task-status">Status *</label>
+
+                    <select id="task-status">
+
+                        <option value="pendente">Pendente</option>
+
+                        <option value="em_andamento">Em Execução</option>
+
+                        <option value="concluida">Concluída</option>
+
+                    </select>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                        class="btn btn-subtle"
+                        onclick="closeTaskModal()">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit"
+                        class="btn btn-primary">
+
+                        Salvar Tarefa
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- MODAL DE EXCLUSÃO -->
+    <div id="confirm-modal"
+        class="modal-backdrop">
+
+        <div class="modal-box modal-sm">
+
+            <div class="modal-header">
+
+                <h3>Confirmar Exclusão</h3>
+
+                <button class="modal-close-btn"
+                    onclick="closeConfirmModal()">
+                    &times;
+                </button>
+
+            </div>
+
+            <div class="modal-body-text">
+
+                <p id="confirm-message">
+                    Deseja realmente remover este registro do banco de dados?
+                </p>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-subtle"
+                    onclick="closeConfirmModal()">
+
+                    Cancelar
+
+                </button>
+
+                <button id="confirm-btn-action"
+                    class="btn btn-danger">
+
+                    Excluir
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- BIBLIOTECA DO SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- JAVASCRIPT DO PROJETO -->
+    <script src="app.js"></script>
+
+</body>
+</html>
